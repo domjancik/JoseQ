@@ -73,3 +73,8 @@ void Switches::print()
     Serial.println();
     Serial.println("------");
 }
+
+bool Switches::get(byte column, byte row) 
+{
+    return switchValues[COLUMN_COUNT * row + column];
+}

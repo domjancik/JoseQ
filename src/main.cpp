@@ -9,8 +9,9 @@
 auto timer = timer_create_default();
 
 #include "Playback.h"
-
 #include "Lights.h"
+
+#define ROW_KICK 0
 
 #define STEP_COUNT 16
 #define STEP_PIN_START 38
@@ -63,10 +64,13 @@ void stepChanged(int step)
 {
   //step = (step + 1) % STEP_COUNT;
   stepLED.setLEDStep(step);
-  lights.flash();
 
   if (switches.read())
     switches.print();
+  
+  if (switches.get(step, ROW_KICK))
+    lights.flash();
+
 }
 
 // Main code

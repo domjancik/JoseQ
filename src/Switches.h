@@ -6,6 +6,7 @@
 #define BITS_PER_DATA_PIN 8
 #define DATA_PIN_COUNT 12
 #define SWITCH_COUNT DATA_PIN_COUNT *BITS_PER_DATA_PIN
+#define COLUMN_COUNT 16
 
 class Switches
 {
@@ -27,6 +28,7 @@ public:
 
     bool read();
     void print();
+    bool get(byte column, byte row);
 };
 
 #endif
