@@ -4,6 +4,8 @@
 #include "Button.h"
 #include "Potentiometer.h"
 
+#include "Playback.h"
+
 #define STEP_COUNT 16
 #define STEP_PIN_START 38
 
@@ -12,7 +14,9 @@ StepLED stepLED(STEP_PIN_START, STEP_COUNT);
 Button startButton(10, "Start");
 Button stopButton(11, "Stop");
 
-Potentiometer tempoPot(A0, 96, 196, "Tempo");
+Playback playback(100);
+
+Potentiometer tempoPot(A0, 96, 240, "Tempo");
 
 int step = 0;
 
@@ -20,9 +24,9 @@ int step = 0;
 
 bool row[ROW_COUNT];
 
-int latchPin = 8;
+int latchPin = 13;
 int dataPin = 22;
-int clockPin = 7;
+int clockPin = 12;
 
 #define DATA_PIN_START 22
 #define DATA_PIN_COUNT 12
@@ -34,53 +38,6 @@ int dataPins[] = {22, 23, 24, 25, 26, 27, 30, 29, 28, 31, 32, 33};
 bool switchValues[SWITCH_COUNT];
 
 byte switchVar1 = 72; //01001000
-
-// Callbacks
-void startChanged(bool pressed) {
-  startButton.print();
-}
-
-void stopChanged(bool pressed) {
-  stopButton.print();
-}
-
-void tempoChanged(int value) {
-  tempoPot.print();
-}
-
-// Main code
-
-void setup()
-{
-  // put your setup code here, to run once:
-  Serial.begin(115200);
-  stepLED.begin();
-
-  startButton.init();
-  stopButton.init();
-
-  startButton.onChange(startChanged);
-  stopButton.onChange(stopChanged);
-  tempoPot.onChange(tempoChanged, 2);
-
-  pinMode(latchPin, OUTPUT);
-
-  pinMode(clockPin, OUTPUT);
-
-  pinMode(dataPin, INPUT);
-
-  for (size_t i = 0; i < SWITCH_COUNT; i++)
-  {
-    switchValues[i] = false;
-  }
-
-  for (size_t i = 0; i < DATA_PIN_COUNT; i++)
-  {
-    pinMode(dataPins[i], INPUT);
-  }
-}
-
-
 
 void latchData(uint8_t latchPin)
 {
@@ -137,17 +94,75 @@ void printSwitches(bool switchValues[])
   Serial.println("------");
 }
 
-void loop()
-{
-  if (readSwitches(dataPins, DATA_PIN_COUNT, latchPin, clockPin, switchValues))
-    printSwitches(switchValues);
+// Callbacks
+void startChanged(bool pressed) {
+  startButton.print();
 
-  step = (step + 1) % STEP_COUNT;
+  if (pressed)
+    playback.start();
+}
+
+void stopChanged(bool pressed) {
+  stopButton.print();
+
+  if (pressed)
+    playback.stop();
+}
+
+void tempoChanged(int value) {
+  tempoPot.print();
+  playback.setBPM(value);
+}
+
+void stepChanged(int step) {
+  //step = (step + 1) % STEP_COUNT;
   stepLED.setLEDStep(step);
 
+  if (readSwitches(dataPins, DATA_PIN_COUNT, latchPin, clockPin, switchValues))
+    printSwitches(switchValues);
+}
+
+// Main code
+
+void setup()
+{
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  stepLED.begin();
+
+  startButton.init();
+  stopButton.init();
+
+  startButton.onChange(startChanged);
+  stopButton.onChange(stopChanged);
+  tempoPot.onChange(tempoChanged, 2);
+
+  playback.setStepCallback(stepChanged);
+  playback.stop();
+
+  pinMode(latchPin, OUTPUT);
+
+  pinMode(clockPin, OUTPUT);
+
+  pinMode(dataPin, INPUT);
+
+  for (size_t i = 0; i < SWITCH_COUNT; i++)
+  {
+    switchValues[i] = false;
+  }
+
+  for (size_t i = 0; i < DATA_PIN_COUNT; i++)
+  {
+    pinMode(dataPins[i], INPUT);
+  }
+}
+
+void loop()
+{
   startButton.update();
   stopButton.update();
   tempoPot.update();
+  playback.update();
 
   // delay(100);
 }
