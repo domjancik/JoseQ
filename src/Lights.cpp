@@ -3,7 +3,6 @@
 #include <Adafruit_NeoPixel.h>
 #include "arduino-timer.h"
 
-// auto timer = timer_create_default();
 extern Timer<> timer;
 
 bool doUpdate(void *argument)

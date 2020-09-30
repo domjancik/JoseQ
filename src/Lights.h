@@ -17,7 +17,7 @@ private:
     Potentiometer dimmer;
 
 public:
-    Lights(byte dataPin, byte pixelCount, byte dimmerPin) : dataPin(dataPin), pixelCount(pixelCount) { dimmer = Potentiometer(dimmerPin, 0, 1000, "Dimmer"); }
+    Lights(byte dataPin, byte pixelCount, byte dimmerPin) : dataPin(dataPin), pixelCount(pixelCount), dimmer(dimmerPin, 0, 1000, "Dimmer") {}
     ~Lights() {}
 
     void begin();

@@ -10,8 +10,7 @@ auto timer = timer_create_default();
 
 #include "Playback.h"
 #include "Lights.h"
-
-#define ROW_KICK 0
+#include "Drumstick.h"
 
 #define STEP_COUNT 16
 #define STEP_PIN_START 38
@@ -35,7 +34,21 @@ Potentiometer tempoPot(A0, 96, 240, "Tempo");
 
 int step = 0;
 
+// Drumsticks
+#define ROW_CRASH 0
+#define ROW_CBHIGH 1
+#define ROW_CBLOW 2
+#define ROW_BUCKET 3
+#define ROW_SNARE 4
+#define ROW_KICK 5
 
+Drumstick drumCrash(2, A2);
+Drumstick drumCBHigh(3, A3);
+Drumstick drumCBLow(4, A4);
+Drumstick drumBucket(5, A5);
+Drumstick drumSnareLeft(6, A6);
+Drumstick drumSnareRight(7, A7);
+Drumstick drumKick(8, A8);
 
 // Callbacks
 void startChanged(bool pressed)
@@ -67,10 +80,24 @@ void stepChanged(int step)
 
   if (switches.read())
     switches.print();
-  
-  if (switches.get(step, ROW_KICK))
-    lights.flash();
 
+  if (switches.get(step, ROW_CRASH)) drumCrash.play();
+  if (switches.get(step, ROW_CBHIGH)) drumCBHigh.play();
+  if (switches.get(step, ROW_CBLOW)) drumCBLow.play();
+  if (switches.get(step, ROW_BUCKET)) drumBucket.play();
+  if (switches.get(step, ROW_SNARE)) {
+    if (step % 2 == 0) {
+      drumSnareLeft.play();
+    } else {
+      drumSnareRight.play();
+    }
+  }
+
+  if (switches.get(step, ROW_KICK))
+  {
+    lights.flash();
+    drumKick.play();
+  }
 }
 
 // Main code

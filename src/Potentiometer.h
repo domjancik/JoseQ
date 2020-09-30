@@ -18,7 +18,6 @@ private:
     int lastCallbackValue;
     int changeThreshold;
 public:
-    Potentiometer() {};
     Potentiometer(uint8_t pin, int minValue, int maxValue, String name) : pin(pin), minValue(minValue), maxValue(maxValue), name(name) {}
     ~Potentiometer() {}
 
