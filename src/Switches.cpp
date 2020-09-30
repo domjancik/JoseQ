@@ -37,8 +37,6 @@ void Switches::begin()
  **/
 bool Switches::read()
 {
-    Serial.println("printing");
-
     latchData();
 
     bool changed = false;
@@ -63,8 +61,6 @@ bool Switches::read()
 
 void Switches::print()
 {
-    Serial.println("printing");
-
     for (size_t i = 0; i < SWITCH_COUNT; i++)
     {
         if (i % 16 == 0)
