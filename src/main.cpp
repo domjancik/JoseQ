@@ -12,6 +12,8 @@ auto timer = timer_create_default();
 #include "Lights.h"
 #include "Drumstick.h"
 
+#define TIMEOUT 30000
+
 #define STEP_COUNT 16
 #define STEP_PIN_START 38
 
@@ -34,6 +36,8 @@ Potentiometer tempoPot(A0, 60, 150, "Tempo");
 
 int step = 0;
 
+long lastChange = 0;
+
 // Drumsticks
 #define ROW_CRASH 0
 #define ROW_CBHIGH 1
@@ -50,10 +54,15 @@ Drumstick drumSnareLeft(6, A6);
 Drumstick drumSnareRight(7, A7);
 Drumstick drumKick(8, A8);
 
+void touch() {
+  lastChange = millis();
+}
+
 // Callbacks
 void startChanged(bool pressed)
 {
   startButton.print();
+  touch();
 
   if (pressed)
     playback.start();
@@ -62,6 +71,7 @@ void startChanged(bool pressed)
 void stopChanged(bool pressed)
 {
   stopButton.print();
+  touch();
 
   if (pressed)
     playback.stop();
@@ -71,6 +81,8 @@ void tempoChanged(int value)
 {
   tempoPot.print();
   playback.setBPM(value);
+
+  touch();
 }
 
 void stepChanged(int step)
@@ -78,8 +90,10 @@ void stepChanged(int step)
   //step = (step + 1) % STEP_COUNT;
   stepLED.setLEDStep(step);
 
-  if (switches.read())
+  if (switches.read()) {
     switches.print();
+    touch();
+  }
 
   if (switches.get(step, ROW_CRASH)) drumCrash.play();
   if (switches.get(step, ROW_CBHIGH)) drumCBHigh.play();
@@ -132,6 +146,11 @@ void loop()
   lights.update();
 
   timer.tick();
+
+  if (playback.isPlaying() && millis() - lastChange > TIMEOUT) {
+    playback.stop();
+    playback.stop();
+  }
 
   // delay(100);
 }
