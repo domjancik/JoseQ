@@ -10,8 +10,9 @@ class Button {
     byte lastReading;
     unsigned long lastDebounceTime = 0;
     unsigned long debounceDelay = 50;
+    String name;
   public:
-    Button(byte pin) {
+    Button(byte pin, String name) : name(name) {
       this->pin = pin;
       lastReading = LOW;
       init();
@@ -41,6 +42,12 @@ class Button {
     }
     bool isPressed() {
       return (getState() == LOW);
+    }
+
+    void print() {
+        Serial.print(name);
+        Serial.print(": ");
+        Serial.println(isPressed());
     }
 };
 

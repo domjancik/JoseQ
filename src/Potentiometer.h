@@ -9,11 +9,15 @@ private:
     uint8_t pin;
     int minValue;
     int maxValue;
+
+    String name;
 public:
-    Potentiometer(uint8_t pin, int minValue, int maxValue) : pin(pin), minValue(minValue), maxValue(maxValue) {}
+    Potentiometer(uint8_t pin, int minValue, int maxValue, String name) : pin(pin), minValue(minValue), maxValue(maxValue), name(name) {}
     ~Potentiometer() {}
 
     int getState();
+
+    void print();
 };
 
 #endif

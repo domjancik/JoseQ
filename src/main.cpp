@@ -1,5 +1,21 @@
 #include <Arduino.h>
 
+#include "StepLED.h"
+#include "Button.h"
+#include "Potentiometer.h"
+
+#define STEP_COUNT 16
+#define STEP_PIN_START 38
+
+StepLED stepLED(STEP_PIN_START, STEP_COUNT);
+
+Button startButton(10, "Start");
+Button stopButton(11, "Stop");
+
+Potentiometer tempoPot(A0, 96, 196, "Tempo");
+
+int step = 0;
+
 #define ROW_COUNT 16
 
 bool row[ROW_COUNT];
@@ -10,6 +26,8 @@ int clockPin = 7;
 
 #define DATA_PIN_START 22
 #define DATA_PIN_COUNT 12
+int dataPins[] = {22, 23, 24, 25, 26, 27, 30, 29, 28, 31, 32, 33};
+
 #define BITS_PER_DATA_PIN 8
 #define SWITCH_COUNT DATA_PIN_COUNT *BITS_PER_DATA_PIN
 
@@ -21,6 +39,10 @@ void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(115200);
+  stepLED.begin();
+
+  startButton.init();
+  stopButton.init();
 
   pinMode(latchPin, OUTPUT);
 
@@ -35,25 +57,8 @@ void setup()
 
   for (size_t i = 0; i < DATA_PIN_COUNT; i++)
   {
-    pinMode(DATA_PIN_START + i, INPUT);
+    pinMode(dataPins[i], INPUT);
   }
-}
-
-uint8_t shiftInCustom(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder)
-{
-  uint8_t value = 0;
-  uint8_t i;
-
-  for (i = 0; i < 8; ++i)
-  {
-    if (bitOrder == LSBFIRST)
-      value |= digitalRead(dataPin) << i;
-    else
-      value |= digitalRead(dataPin) << (7 - i);
-    digitalWrite(clockPin, HIGH);
-    digitalWrite(clockPin, LOW);
-  }
-  return value;
 }
 
 void latchData(uint8_t latchPin)
@@ -74,18 +79,18 @@ void shiftData(uint8_t clockPin)
  * 
  * Returns true if changed 
  **/
-bool readSwitches(uint8_t dataPinFirst, uint8_t dataPinCount, uint8_t latchPin, uint8_t clockPin, bool switchValues[])
+bool readSwitches(int dataPins[], uint8_t dataPinsLength, uint8_t latchPin, uint8_t clockPin, bool switchValues[])
 {
   latchData(latchPin);
   bool changed = false;
 
   for (int i = BITS_PER_DATA_PIN - 1; i >= 0; i--)
   {
-    for (size_t dataPinIndex = 0; dataPinIndex < dataPinCount; dataPinIndex++)
+    for (size_t dataPinIndex = 0; dataPinIndex < dataPinsLength; dataPinIndex++)
     {
       size_t switchIndex = i + (dataPinIndex * BITS_PER_DATA_PIN);
       bool lastValue = switchValues[switchIndex];
-      bool newValue = digitalRead(dataPinFirst + dataPinIndex);
+      bool newValue = digitalRead(dataPins[dataPinIndex]);
       switchValues[switchIndex] = newValue;
 
       changed = changed || lastValue != newValue;
@@ -100,8 +105,13 @@ void printSwitches(bool switchValues[])
 {
   for (size_t i = 0; i < SWITCH_COUNT; i++)
   {
+    if (i % 16 == 0)
+      Serial.println();
+    if (i % 4 == 0)
+      Serial.print(' ');
     Serial.print(switchValues[i]);
   }
+  Serial.println();
   Serial.println();
   Serial.println("------");
 }
@@ -118,10 +128,18 @@ void loop()
   }
   Serial.println();*/
 
-  if (readSwitches(DATA_PIN_START, DATA_PIN_COUNT, latchPin, clockPin, switchValues))
+  if (readSwitches(dataPins, DATA_PIN_COUNT, latchPin, clockPin, switchValues))
     printSwitches(switchValues);
 
   // Serial.println(switchVar1, BIN);
   // Serial.println(switchVar1);
+
+  step = (step + 1) % STEP_COUNT;
+  stepLED.setLEDStep(step);
+
+  startButton.print();
+  stopButton.print();
+  tempoPot.print();
+
   delay(100);
 }
