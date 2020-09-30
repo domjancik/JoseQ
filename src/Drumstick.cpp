@@ -24,17 +24,13 @@ bool timerHandler(void * argument) {
 
 void Drumstick::play() 
 {
-    Serial.println("play");
     digitalWrite(pin, HIGH);
     calibrationPot.update();
-    auto delay = calibrationPot.getState();
-    Serial.println(delay);
     timer.in(calibrationPot.getState(), timerHandler, this);
 }
 
 void Drumstick::stop() 
 {
-    Serial.println("stop");
     digitalWrite(pin, LOW);
 }
 
