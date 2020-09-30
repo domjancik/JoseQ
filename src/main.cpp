@@ -30,7 +30,7 @@ Playback playback(100);
 
 Lights lights(9, 16, A1);
 
-Potentiometer tempoPot(A0, 96, 240, "Tempo");
+Potentiometer tempoPot(A0, 60, 150, "Tempo");
 
 int step = 0;
 

@@ -10,7 +10,7 @@ extern Timer<> timer;
 
 long bpmToStepMillis(int bpm)
 {
-    return 60000 / bpm;
+    return 15000 / bpm;
 }
 
 void Playback::update()
