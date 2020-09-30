@@ -11,16 +11,24 @@ class Button {
     unsigned long lastDebounceTime = 0;
     unsigned long debounceDelay = 50;
     String name;
+
+    void (*changeCallback)(bool);
   public:
     Button(byte pin, String name) : name(name) {
       this->pin = pin;
       lastReading = LOW;
+      changeCallback = nullptr;
       init();
     }
     void init() {
       pinMode(pin, INPUT_PULLUP);
       update();
     }
+
+    void onChange(void (*changeCallback)(bool)) {
+        this->changeCallback = changeCallback;
+    }
+
     void update() {
       // You can handle the debounce of the button directly
       // in the class, so you don't have to think about it
@@ -32,12 +40,14 @@ class Button {
       }
       if (millis() - lastDebounceTime > debounceDelay) {
         // Update the 'state' attribute only if debounce is checked
+        if (changeCallback != nullptr && newReading != state) {
+            changeCallback(newReading == LOW);
+        }
         state = newReading;
       }
       lastReading = newReading;
     }
     byte getState() {
-      update();
       return state;
     }
     bool isPressed() {

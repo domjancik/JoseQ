@@ -35,6 +35,21 @@ bool switchValues[SWITCH_COUNT];
 
 byte switchVar1 = 72; //01001000
 
+// Callbacks
+void startChanged(bool pressed) {
+  startButton.print();
+}
+
+void stopChanged(bool pressed) {
+  stopButton.print();
+}
+
+void tempoChanged(int value) {
+  tempoPot.print();
+}
+
+// Main code
+
 void setup()
 {
   // put your setup code here, to run once:
@@ -43,6 +58,10 @@ void setup()
 
   startButton.init();
   stopButton.init();
+
+  startButton.onChange(startChanged);
+  stopButton.onChange(stopChanged);
+  tempoPot.onChange(tempoChanged, 2);
 
   pinMode(latchPin, OUTPUT);
 
@@ -60,6 +79,8 @@ void setup()
     pinMode(dataPins[i], INPUT);
   }
 }
+
+
 
 void latchData(uint8_t latchPin)
 {
@@ -118,28 +139,15 @@ void printSwitches(bool switchValues[])
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
-
-  /*switchVar1 = shiftInCustom(dataPin, clockPin, LSBFIRST);
-
-  for (size_t i = 0; i < 8; i++)
-  {
-    Serial.print((switchVar1 << i & B10000000) == B10000000 ? 0 : 1);
-  }
-  Serial.println();*/
-
   if (readSwitches(dataPins, DATA_PIN_COUNT, latchPin, clockPin, switchValues))
     printSwitches(switchValues);
-
-  // Serial.println(switchVar1, BIN);
-  // Serial.println(switchVar1);
 
   step = (step + 1) % STEP_COUNT;
   stepLED.setLEDStep(step);
 
-  startButton.print();
-  stopButton.print();
-  tempoPot.print();
+  startButton.update();
+  stopButton.update();
+  tempoPot.update();
 
-  delay(100);
+  // delay(100);
 }
