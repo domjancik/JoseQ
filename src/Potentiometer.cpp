@@ -4,8 +4,25 @@
 
 int Potentiometer::getState() 
 {
-    Serial.println(analogRead(pin));
-    return map(analogRead(pin), 0, 1024, minValue, maxValue);
+    return lastValue;
+}
+
+void Potentiometer::onChange(void (*changeCallback)(int), int changeThreshold) 
+{
+    this->changeCallback = changeCallback;
+    this->changeThreshold = changeThreshold;
+}
+
+void Potentiometer::update() 
+{
+    int newValue = map(analogRead(pin), 0, 1024, minValue, maxValue);
+    
+    if (changeCallback != nullptr && abs(newValue - lastCallbackValue) > changeThreshold) {
+        changeCallback(newValue);
+        lastCallbackValue = newValue;
+    }
+
+    lastValue = newValue;
 }
 
 void Potentiometer::print() 
