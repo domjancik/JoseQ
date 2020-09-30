@@ -4,7 +4,12 @@
 #include "Button.h"
 #include "Potentiometer.h"
 
+#include "arduino-timer.h"
+auto timer = timer_create_default();
+
 #include "Playback.h"
+
+#include "Lights.h"
 
 #define STEP_COUNT 16
 #define STEP_PIN_START 38
@@ -15,6 +20,8 @@ Button startButton(10, "Start");
 Button stopButton(11, "Stop");
 
 Playback playback(100);
+
+Lights lights(9, 16, A1);
 
 Potentiometer tempoPot(A0, 96, 240, "Tempo");
 
@@ -95,28 +102,33 @@ void printSwitches(bool switchValues[])
 }
 
 // Callbacks
-void startChanged(bool pressed) {
+void startChanged(bool pressed)
+{
   startButton.print();
 
   if (pressed)
     playback.start();
 }
 
-void stopChanged(bool pressed) {
+void stopChanged(bool pressed)
+{
   stopButton.print();
 
   if (pressed)
     playback.stop();
 }
 
-void tempoChanged(int value) {
+void tempoChanged(int value)
+{
   tempoPot.print();
   playback.setBPM(value);
 }
 
-void stepChanged(int step) {
+void stepChanged(int step)
+{
   //step = (step + 1) % STEP_COUNT;
   stepLED.setLEDStep(step);
+  lights.flash();
 
   if (readSwitches(dataPins, DATA_PIN_COUNT, latchPin, clockPin, switchValues))
     printSwitches(switchValues);
@@ -139,6 +151,8 @@ void setup()
 
   playback.setStepCallback(stepChanged);
   playback.stop();
+
+  lights.begin();
 
   pinMode(latchPin, OUTPUT);
 
@@ -163,6 +177,9 @@ void loop()
   stopButton.update();
   tempoPot.update();
   playback.update();
+  lights.update();
+
+  timer.tick();
 
   // delay(100);
 }

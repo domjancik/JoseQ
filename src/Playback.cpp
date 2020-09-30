@@ -3,7 +3,10 @@
 #include <Arduino.h>
 #include "arduino-timer.h"
 
-auto timer = timer_create_default();
+// auto timer = timer_create_default();
+// Timer<3> timer;
+extern Timer<> timer;
+
 
 long bpmToStepMillis(int bpm)
 {
@@ -12,7 +15,6 @@ long bpmToStepMillis(int bpm)
 
 void Playback::update()
 {
-    timer.tick();
 }
 
 bool timerFunction(void *argument)
