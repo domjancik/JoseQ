@@ -4,8 +4,8 @@
 #include <Arduino.h>
 #include "Potentiometer.h"
 
-#define MAX_DRUMSTICK_MILLIS 500
-#define MIN_DRUMSTICK_MILLIS 50
+#define MAX_DRUMSTICK_MILLIS 200
+#define MIN_DRUMSTICK_MILLIS 15
 
 class Drumstick
 {
