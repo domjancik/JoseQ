@@ -40,7 +40,13 @@ void Lights::updateFrame()
 void Lights::show()
 {
     byte outIntensity = intensity * 255 * ((float)(dimmer.getState()) / 1000.0);
-    auto color = pixels.Color(outIntensity, outIntensity, outIntensity);
-    pixels.fill(color, 0, pixelCount);
+    byte eyeIntensity = 255.0f * ((float)(dimmer.getState()) / 1000.0);
+
+    auto eyeColor = pixels.Color(eyeIntensity, 0, 0);
+    auto heartColor = pixels.Color(0, outIntensity, 0);
+
+    pixels.fill(heartColor, 0, 6);
+    pixels.fill(eyeColor, 6, 2);
+
     pixels.show();
 }
