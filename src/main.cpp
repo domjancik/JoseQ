@@ -95,6 +95,8 @@ void stepChanged(int step)
     touch();
   }
 
+  if (!playback.isPlaying()) return;
+
   if (switches.get(step, ROW_CRASH)) drumCrash.play();
   if (switches.get(step, ROW_CBHIGH)) drumCBHigh.play();
   if (switches.get(step, ROW_CBLOW)) drumCBLow.play();
