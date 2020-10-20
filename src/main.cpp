@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+#include "settings.h"
+
 #include "StepLED.h"
 #include "Button.h"
 #include "Potentiometer.h"
@@ -11,8 +13,6 @@ auto timer = timer_create_default();
 #include "Playback.h"
 #include "Lights.h"
 #include "Drumstick.h"
-
-#define TIMEOUT 30000
 
 #define STEP_COUNT 16
 #define STEP_PIN_START 38
@@ -30,9 +30,9 @@ Button stopButton(11, "Stop");
 
 Playback playback(100);
 
-Lights lights(9, 16, A1);
+Lights lights(9, 16, A7);
 
-Potentiometer tempoPot(A0, 50, 150, "Tempo");
+Potentiometer tempoPot(A0, MIN_TEMPO, MAX_TEMPO, "Tempo");
 
 int step = 0;
 
@@ -46,13 +46,13 @@ long lastChange = 0;
 #define ROW_SNARE 4
 #define ROW_KICK 5
 
-Drumstick drumCrash(2, A2);
-Drumstick drumCBHigh(3, A3);
-Drumstick drumCBLow(4, A4);
-Drumstick drumBucket(5, A5);
-Drumstick drumSnareLeft(6, A6);
-Drumstick drumSnareRight(7, A7);
-Drumstick drumKick(8, A8);
+Drumstick drumCrash(2, A2, "crash");
+Drumstick drumCBHigh(3, A3, "cbHigh");
+Drumstick drumCBLow(4, A4, "cbLow");
+Drumstick drumBucket(5, A5, "bucket");
+Drumstick drumSnareLeft(6, A6, "snareLeft");
+Drumstick drumSnareRight(7, A1, "snareRight");
+Drumstick drumKick(8, A8, "kick");
 
 void touch() {
   lastChange = millis();
@@ -149,10 +149,12 @@ void loop()
 
   timer.tick();
 
+  #ifdef TIMEOUT_ENABLED
   if (playback.isPlaying() && millis() - lastChange > TIMEOUT) {
     playback.stop();
     playback.stop();
   }
+  #endif
 
   // delay(100);
 }

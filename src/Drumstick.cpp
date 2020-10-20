@@ -4,8 +4,8 @@
 
 extern Timer<> timer;
 
-Drumstick::Drumstick(byte pin, byte calibrationPin) : pin(pin),
-                                                      calibrationPot(pin, MIN_DRUMSTICK_MILLIS, MAX_DRUMSTICK_MILLIS, "Drumstick Calibration")
+Drumstick::Drumstick(byte pin, byte calibrationPin, String name) : pin(pin),
+                                                      calibrationPot(calibrationPin, MIN_DRUMSTICK_MILLIS, MAX_DRUMSTICK_MILLIS, "Drumstick Calibration"), name(name)
 {
     begin();
 }

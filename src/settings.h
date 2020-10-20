@@ -1,0 +1,4 @@
+#define TIMEOUT_ENABLED
+#define TIMEOUT 30000
+#define MIN_TEMPO 50
+#define MAX_TEMPO 120

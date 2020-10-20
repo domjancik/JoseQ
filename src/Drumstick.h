@@ -14,8 +14,10 @@ private:
     byte calibrationPin;
 
     Potentiometer calibrationPot;
+
+    String name;
 public:
-    Drumstick(byte pin, byte calibrationPin);
+    Drumstick(byte pin, byte calibrationPin, String name);
     ~Drumstick() {}
 
     void begin();
